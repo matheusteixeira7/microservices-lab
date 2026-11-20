@@ -35,9 +35,9 @@ Mais tarde: um serviço de **suporte com IA** e um **dashboard em Next.js**.
 - [x] Criar os 4 serviços (2 em NestJS, 1 em Go, 1 em Fastify puro)
 - [x] Testes e2e dentro de cada serviço (`apps/<servico>/e2e/`), todos com Vitest
 - [x] Cada serviço com sua própria porta (pedidos 3001, pagamento 3002, estoque 3003, notificação 3004)
-- [ ] Um Postgres por serviço (cada serviço é dono dos seus dados)
-- [ ] Tudo subindo com Docker Compose
-- [ ] Primeiro ADR: por que esses limites entre serviços (bounded contexts / DDD)
+- [x] Um Postgres por serviço (cada serviço é dono dos seus dados)
+- [x] Tudo subindo com Docker Compose (`docker compose up -d --build`)
+- [x] Primeiro ADR: por que esses limites entre serviços (bounded contexts / DDD) — [`docs/adr/0001`](docs/adr/0001-limites-entre-servicos.md)
 
 ## Fase 1 — Comunicação
 
