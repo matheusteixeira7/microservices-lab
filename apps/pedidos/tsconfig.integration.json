@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/integration",
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["vitest.integration.config.mts", "integration/**/*.ts", "src/**/*.contract.ts"],
+  "references": [{ "path": "./tsconfig.app.json" }]
+}

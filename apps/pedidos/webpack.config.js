@@ -26,8 +26,11 @@ module.exports = {
       target: 'node',
       compiler: 'tsc',
       main: './src/main.ts',
+      // Second bundle: dist/migrate.js (one-shot migrations container).
+      additionalEntryPoints: [{ entryName: 'migrate', entryPath: './src/migrate.ts' }],
       tsConfig: './tsconfig.app.json',
-      assets: ["./src/assets"],
+      // drizzle/ (the SQL migrations) is copied to dist/drizzle for migrate.js.
+      assets: ['./src/assets', { input: './drizzle', glob: '**/*', output: 'drizzle' }],
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: false,

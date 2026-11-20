@@ -1,1 +1,13 @@
-{"version":"7","dialect":"postgresql","entries":[]}
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1795197105823,
+      "tag": "0000_create_orders_and_outbox",
+      "breakpoints": true
+    }
+  ]
+}

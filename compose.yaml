@@ -1,4 +1,4 @@
-# Sobe tudo:            docker compose up -d --build
+# Sobe tudo:            docker compose up -d --build   (inclui as migrations do pedidos)
 # Só os bancos (dev):   docker compose up -d postgres-pedidos postgres-pagamento postgres-estoque postgres-notificacao
 # Derruba tudo:         docker compose down        (com -v apaga os dados)
 #
@@ -48,7 +48,19 @@ services:
     volumes: [notificacao-data:/var/lib/postgresql]
 
   # ---------- serviços ----------
+  # Roda as migrations uma vez e sai. O pedidos só sobe depois que ele termina com sucesso.
+  pedidos-migrate:
+    image: microservices-lab-pedidos
+    build: { context: ., dockerfile: docker/node.Dockerfile, args: { APP: pedidos } }
+    command: ["node", "migrate.js"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://pedidos:pedidos@postgres-pedidos:5432/pedidos
+    depends_on:
+      postgres-pedidos: { condition: service_healthy }
+
   pedidos:
+    image: microservices-lab-pedidos
     build: { context: ., dockerfile: docker/node.Dockerfile, args: { APP: pedidos } }
     restart: unless-stopped
     environment:
@@ -56,7 +68,7 @@ services:
       DATABASE_URL: postgres://pedidos:pedidos@postgres-pedidos:5432/pedidos
     ports: ["3001:3001"]
     depends_on:
-      postgres-pedidos: { condition: service_healthy }
+      pedidos-migrate: { condition: service_completed_successfully }
     healthcheck:
       <<: *app-healthcheck
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]

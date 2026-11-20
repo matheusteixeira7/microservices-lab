@@ -81,6 +81,13 @@
       "dependsOn": [
         "serve"
       ]
+    },
+    "integration": {
+      "command": "vitest run --config vitest.integration.config.mts",
+      "options": {
+        "cwd": "apps/pedidos"
+      },
+      "cache": false
     }
   },
   "tags": []

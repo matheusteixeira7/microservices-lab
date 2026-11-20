@@ -13,7 +13,11 @@
       "!{projectRoot}/test-setup.[jt]s",
       "!{projectRoot}/e2e/**/*",
       "!{projectRoot}/vitest.e2e.config.mts",
-      "!{projectRoot}/tsconfig.e2e.json"
+      "!{projectRoot}/tsconfig.e2e.json",
+      "!{projectRoot}/integration/**/*",
+      "!{projectRoot}/vitest.integration.config.mts",
+      "!{projectRoot}/tsconfig.integration.json",
+      "!{projectRoot}/**/*.contract.ts"
     ]
   },
   "targetDefaults": {
