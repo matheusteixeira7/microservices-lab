@@ -72,9 +72,20 @@
     }
   },
   "dependencies": {
+    "@fastify/autoload": "~6.5.0",
+    "@fastify/sensible": "~6.0.6",
+    "drizzle-orm": "^0.45.4",
     "fastify": "~5.12.5",
     "fastify-plugin": "~6.0.0",
-    "@fastify/autoload": "~6.5.0",
-    "@fastify/sensible": "~6.0.6"
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   }
 }

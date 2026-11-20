@@ -1,0 +1,18 @@
+# .dockerignore só para docker/node.Dockerfile (substitui o da raiz).
+# Igual ao .dockerignore da raiz + sem o código Go: a imagem Node não tem Go,
+# e o plugin @nx-go/nx-go quebra o Nx se encontrar o go.work sem o `go` instalado.
+**/node_modules
+**/dist
+**/out-tsc
+**/test-output
+**/*.tsbuildinfo
+.nx
+.git
+.vscode
+.env
+.env.*
+!.env.example
+*.log
+go.work
+go.work.sum
+apps/estoque

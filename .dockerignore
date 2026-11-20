@@ -1,0 +1,14 @@
+# O node_modules do Mac (arm64/darwin) quebra no Linux do container:
+# as dependências são instaladas de novo dentro da imagem.
+**/node_modules
+**/dist
+**/out-tsc
+**/test-output
+**/*.tsbuildinfo
+.nx
+.git
+.vscode
+.env
+.env.*
+!.env.example
+*.log

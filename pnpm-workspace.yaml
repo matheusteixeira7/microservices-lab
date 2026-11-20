@@ -7,3 +7,4 @@ allowBuilds:
   unrs-resolver: false
   "@swc/core": false
   "@nestjs/core": false
+  esbuild: true

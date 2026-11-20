@@ -1,0 +1,109 @@
+# Sobe tudo:            docker compose up -d --build
+# Só os bancos (dev):   docker compose up -d postgres-pedidos postgres-pagamento postgres-estoque postgres-notificacao
+# Derruba tudo:         docker compose down        (com -v apaga os dados)
+#
+# Senhas aqui são só de desenvolvimento local.
+
+name: microservices-lab
+
+x-postgres: &postgres
+  image: postgres:18-alpine
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+    interval: 5s
+    timeout: 3s
+    retries: 10
+
+x-app-healthcheck: &app-healthcheck
+  interval: 10s
+  timeout: 3s
+  retries: 3
+  start_period: 10s
+
+services:
+  # ---------- bancos: um Postgres por serviço ----------
+  postgres-pedidos:
+    <<: *postgres
+    environment: { POSTGRES_USER: pedidos, POSTGRES_PASSWORD: pedidos, POSTGRES_DB: pedidos }
+    ports: ["5441:5432"]
+    volumes: [pedidos-data:/var/lib/postgresql]
+
+  postgres-pagamento:
+    <<: *postgres
+    environment: { POSTGRES_USER: pagamento, POSTGRES_PASSWORD: pagamento, POSTGRES_DB: pagamento }
+    ports: ["5442:5432"]
+    volumes: [pagamento-data:/var/lib/postgresql]
+
+  postgres-estoque:
+    <<: *postgres
+    environment: { POSTGRES_USER: estoque, POSTGRES_PASSWORD: estoque, POSTGRES_DB: estoque }
+    ports: ["5443:5432"]
+    volumes: [estoque-data:/var/lib/postgresql]
+
+  postgres-notificacao:
+    <<: *postgres
+    environment: { POSTGRES_USER: notificacao, POSTGRES_PASSWORD: notificacao, POSTGRES_DB: notificacao }
+    ports: ["5444:5432"]
+    volumes: [notificacao-data:/var/lib/postgresql]
+
+  # ---------- serviços ----------
+  pedidos:
+    build: { context: ., dockerfile: docker/node.Dockerfile, args: { APP: pedidos } }
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+      DATABASE_URL: postgres://pedidos:pedidos@postgres-pedidos:5432/pedidos
+    ports: ["3001:3001"]
+    depends_on:
+      postgres-pedidos: { condition: service_healthy }
+    healthcheck:
+      <<: *app-healthcheck
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+
+  pagamento:
+    build: { context: ., dockerfile: docker/node.Dockerfile, args: { APP: pagamento } }
+    restart: unless-stopped
+    environment:
+      PORT: "3002"
+      DATABASE_URL: postgres://pagamento:pagamento@postgres-pagamento:5432/pagamento
+    ports: ["3002:3002"]
+    depends_on:
+      postgres-pagamento: { condition: service_healthy }
+    healthcheck:
+      <<: *app-healthcheck
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3002/api/health"]
+
+  estoque:
+    build: { context: ., dockerfile: docker/go.Dockerfile }
+    restart: unless-stopped
+    environment:
+      PORT: "3003"
+      DATABASE_URL: postgres://estoque:estoque@postgres-estoque:5432/estoque
+    ports: ["3003:3003"]
+    depends_on:
+      postgres-estoque: { condition: service_healthy }
+    healthcheck:
+      <<: *app-healthcheck
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3003/api/health"]
+
+  notificacao:
+    build: { context: ., dockerfile: docker/node.Dockerfile, args: { APP: notificacao } }
+    restart: unless-stopped
+    environment:
+      PORT: "3004"
+      # O Fastify escuta só em localhost por padrão; no container precisa ser 0.0.0.0.
+      HOST: 0.0.0.0
+      DATABASE_URL: postgres://notificacao:notificacao@postgres-notificacao:5432/notificacao
+    ports: ["3004:3004"]
+    depends_on:
+      postgres-notificacao: { condition: service_healthy }
+    healthcheck:
+      <<: *app-healthcheck
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3004/health"]
+
+volumes:
+  pedidos-data:
+  pagamento-data:
+  estoque-data:
+  notificacao-data:
