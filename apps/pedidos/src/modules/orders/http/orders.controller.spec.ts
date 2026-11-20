@@ -2,13 +2,37 @@ import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { ErrorHandlingModule } from '../../../shared/http/error-handling.module';
+import type {
+  InventoryGateway,
+  ProductInfo,
+  ReservationResult,
+  ReserveItem,
+} from '../application/ports/inventory.gateway';
 import { InMemoryOrderRepository } from '../infrastructure/in-memory-order.repository';
 import { OrdersModule } from '../orders.module';
-import { ORDER_REPOSITORY } from '../orders.tokens';
+import { INVENTORY_GATEWAY, ORDER_REPOSITORY } from '../orders.tokens';
+
+/** Deterministic inventory for HTTP tests: no estoque, no network. */
+class FakeInventory implements InventoryGateway {
+  private readonly catalog: ProductInfo[] = [
+    { sku: 'KB-1', name: 'Mechanical keyboard', priceCents: 45000, currency: 'BRL' },
+    { sku: 'MS-1', name: 'Wireless mouse', priceCents: 15000, currency: 'BRL' },
+    { sku: 'OUT-1', name: 'Always out of stock', priceCents: 1000, currency: 'BRL' },
+  ];
+
+  async findProducts(skus: string[]): Promise<ProductInfo[]> {
+    return this.catalog.filter((product) => skus.includes(product.sku));
+  }
+
+  async reserve(_orderId: string, items: ReserveItem[]): Promise<ReservationResult> {
+    const unavailableSkus = items.map((item) => item.sku).filter((sku) => sku === 'OUT-1');
+    return unavailableSkus.length > 0 ? { status: 'OUT_OF_STOCK', unavailableSkus } : { status: 'RESERVED' };
+  }
+}
 
 /*
- * HTTP tests without a database: the real module, with the repository swapped
- * for the in-memory one. Inventory is the (deterministic) stub.
+ * HTTP tests without a database or estoque: the real module, with the
+ * repository and the inventory swapped for in-memory fakes.
  */
 describe('OrdersController (HTTP)', () => {
   let app: INestApplication;
@@ -17,6 +41,8 @@ describe('OrdersController (HTTP)', () => {
     const module = await Test.createTestingModule({ imports: [OrdersModule, ErrorHandlingModule] })
       .overrideProvider(ORDER_REPOSITORY)
       .useValue(new InMemoryOrderRepository())
+      .overrideProvider(INVENTORY_GATEWAY)
+      .useValue(new FakeInventory())
       .compile();
 
     app = module.createNestApplication();

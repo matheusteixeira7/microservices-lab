@@ -4,5 +4,8 @@
   ],
   "plugins": [
     "vitest"
+  ],
+  "ignorePatterns": [
+    "src/gen/**"
   ]
 }

@@ -2,7 +2,7 @@
 # Imagem do serviço estoque (Go).
 # Uso: docker build -f docker/go.Dockerfile .
 
-FROM golang:1.25-alpine AS build
+FROM golang:1.26-alpine AS build
 WORKDIR /src
 # Só go.mod/go.sum primeiro: esta camada só refaz quando as dependências mudam.
 COPY apps/estoque/go.mod apps/estoque/go.sum ./

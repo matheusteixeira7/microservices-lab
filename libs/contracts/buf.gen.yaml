@@ -1,0 +1,26 @@
+# Generates code for every service from proto/. Run: pnpm nx codegen contracts
+# The generated code is committed (the Docker images do not have buf).
+# All plugins are local and pinned by the repo:
+#   - Go: `go tool` reads them from apps/estoque/go.mod (through the root go.work)
+#   - TS: node_modules/.bin/protoc-gen-es
+version: v2
+clean: true
+managed:
+  enabled: true
+  override:
+    # The Go module is `apps/estoque`, so generated packages must live under it.
+    - file_option: go_package_prefix
+      value: apps/estoque/internal/gen
+plugins:
+  # --- estoque (Go): server ---
+  - local: [go, tool, protoc-gen-go]
+    out: ../../apps/estoque/internal/gen
+    opt: paths=source_relative
+  - local: [go, tool, protoc-gen-go-grpc]
+    out: ../../apps/estoque/internal/gen
+    opt: paths=source_relative
+  # --- pedidos (TypeScript): client ---
+  - local: ../../node_modules/.bin/protoc-gen-es
+    out: ../../apps/pedidos/src/gen
+    opt: target=ts
+    include_imports: true

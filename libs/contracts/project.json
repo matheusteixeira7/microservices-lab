@@ -1,0 +1,20 @@
+{
+  "name": "contracts",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/contracts/proto",
+  "targets": {
+    "lint": {
+      "command": "buf lint",
+      "options": { "cwd": "libs/contracts" },
+      "cache": true,
+      "inputs": ["{projectRoot}/**/*"]
+    },
+    "codegen": {
+      "command": "buf generate",
+      "options": { "cwd": "libs/contracts" },
+      "dependsOn": ["lint"]
+    }
+  },
+  "tags": []
+}

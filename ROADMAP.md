@@ -41,10 +41,10 @@ Mais tarde: um serviço de **suporte com IA** e um **dashboard em Next.js**.
 
 ## Fase 1 — Comunicação
 
-- [ ] gRPC entre pedidos → estoque (chamada síncrona)
+- [x] gRPC entre pedidos → estoque (chamada síncrona) — `libs/contracts/proto/inventory/v1`
 - [ ] Eventos com Kafka (Redpanda localmente)
-- [ ] Contratos versionados: protobuf + schemas de eventos
-- [ ] Usar `buf` para gerar código dos `.proto` em TypeScript e Go
+- [ ] Contratos versionados: protobuf ✔ + schemas de eventos (falta)
+- [x] Usar `buf` para gerar código dos `.proto` em TypeScript e Go (`pnpm nx codegen contracts`)
 - [ ] Estudar: quando usar síncrono vs assíncrono
 
 ## Fase 2 — Consistência

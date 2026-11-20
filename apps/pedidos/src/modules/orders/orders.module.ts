@@ -6,7 +6,7 @@ import type { InventoryGateway } from './application/ports/inventory.gateway';
 import type { OrderRepository } from './domain/order.repository';
 import { OrdersController } from './http/orders.controller';
 import { DrizzleOrderRepository } from './infrastructure/drizzle-order.repository';
-import { StubInventoryGateway } from './infrastructure/stub-inventory.gateway';
+import { GrpcInventoryGateway } from './infrastructure/grpc-inventory.gateway';
 import { INVENTORY_GATEWAY, ORDER_REPOSITORY } from './orders.tokens';
 
 /**
@@ -23,7 +23,8 @@ import { INVENTORY_GATEWAY, ORDER_REPOSITORY } from './orders.tokens';
     },
     {
       provide: INVENTORY_GATEWAY,
-      useFactory: () => new StubInventoryGateway(), // TEMPORARY: gRPC client in Phase 1
+      useFactory: () =>
+        new GrpcInventoryGateway({ baseUrl: process.env.INVENTORY_GRPC_URL ?? 'http://localhost:50051' }),
     },
     {
       provide: CreateOrderUseCase,

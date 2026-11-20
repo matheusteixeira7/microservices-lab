@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+// Contract between pedidos (client) and estoque (server).
+// v1: never remove or renumber a field. Breaking changes go to inventory.v2.
+package inventory.v1;
+
+// InventoryService owns products (SKU, name, price), stock and reservations.
+//
+// Error statuses (business "no" answers are NOT errors, see ReserveStockResponse):
+//   INVALID_ARGUMENT     malformed request (empty order id, no items, quantity <= 0, duplicate SKU)
+//   ALREADY_EXISTS       order id already used for a reservation with different items
+//   FAILED_PRECONDITION  reservation already released, or invalid transition
+//   NOT_FOUND            no reservation for the order (CommitStock)
+//   INTERNAL             anything else
+service InventoryService {
+  // Catalog data for the SKUs that exist. Unknown SKUs are simply absent.
+  rpc FindProducts(FindProductsRequest) returns (FindProductsResponse);
+
+  // Holds stock for an order, all-or-nothing.
+  // order_id is the idempotency key: repeating the same request is safe.
+  rpc ReserveStock(ReserveStockRequest) returns (ReserveStockResponse);
+
+  // Gives the stock of an order back (order cancelled). Idempotent.
+  // If it arrives before ReserveStock, a later ReserveStock for the same
+  // order fails with FAILED_PRECONDITION.
+  rpc ReleaseStock(ReleaseStockRequest) returns (ReleaseStockResponse);
+
+  // Takes the reserved stock out of the warehouse (order confirmed). Idempotent.
+  rpc CommitStock(CommitStockRequest) returns (CommitStockResponse);
+}
+
+// Money in integer cents (no floats).
+message Money {
+  int64 cents = 1;
+  // ISO 4217 code, e.g. "BRL".
+  string currency = 2;
+}
+
+message Product {
+  string sku = 1;
+  string name = 2;
+  Money price = 3;
+}
+
+message FindProductsRequest {
+  repeated string skus = 1;
+}
+
+message FindProductsResponse {
+  repeated Product products = 1;
+}
+
+message ReserveItem {
+  string sku = 1;
+  int32 quantity = 2;
+}
+
+message ReserveStockRequest {
+  string order_id = 1;
+  repeated ReserveItem items = 2;
+}
+
+message ReserveStockResponse {
+  // Every item is reserved.
+  message Reserved {}
+
+  // Nothing was reserved. Lists every SKU that could not be (not enough stock, or unknown).
+  message OutOfStock {
+    repeated string unavailable_skus = 1;
+  }
+
+  oneof result {
+    Reserved reserved = 1;
+    OutOfStock out_of_stock = 2;
+  }
+}
+
+message ReleaseStockRequest {
+  string order_id = 1;
+}
+
+message ReleaseStockResponse {}
+
+message CommitStockRequest {
+  string order_id = 1;
+}
+
+message CommitStockResponse {}
