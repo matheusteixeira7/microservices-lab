@@ -1,0 +1,25 @@
+{
+  "name": "pagamento-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "pagamento"
+    ],
+    "targets": {
+      "e2e": {
+        "command": "jest --passWithNoTests",
+        "options": {
+          "cwd": "apps/pagamento-e2e"
+        },
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "dependsOn": [
+          "pagamento:build",
+          "pagamento:serve"
+        ]
+      }
+    }
+  }
+}
