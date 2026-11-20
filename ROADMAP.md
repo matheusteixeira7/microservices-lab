@@ -32,7 +32,9 @@ Mais tarde: um serviço de **suporte com IA** e um **dashboard em Next.js**.
 ## Fase 0 — Base
 
 - [x] Monorepo com Nx (pnpm para JS/TS, Go modules + plugin `@nx-go/nx-go` para Go)
-- [ ] Criar os 4 serviços (2 em NestJS, 1 em Go, 1 em Fastify puro)
+- [x] Criar os 4 serviços (2 em NestJS, 1 em Go, 1 em Fastify puro)
+- [x] Testes e2e dentro de cada serviço (`apps/<servico>/e2e/`), todos com Vitest
+- [x] Cada serviço com sua própria porta (pedidos 3001, pagamento 3002, estoque 3003, notificação 3004)
 - [ ] Um Postgres por serviço (cada serviço é dono dos seus dados)
 - [ ] Tudo subindo com Docker Compose
 - [ ] Primeiro ADR: por que esses limites entre serviços (bounded contexts / DDD)

@@ -59,6 +59,15 @@
         "readyWhen": {
           "signal": true
         }
+      },
+      "e2e": {
+        "command": "vitest run --config vitest.e2e.config.mts",
+        "options": {
+          "cwd": "apps/notificacao"
+        },
+        "dependsOn": [
+          "serve"
+        ]
       }
     }
   },

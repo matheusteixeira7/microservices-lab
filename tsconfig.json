@@ -4,19 +4,10 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/pedidos-e2e"
-    },
-    {
       "path": "./apps/pedidos"
     },
     {
-      "path": "./apps/pagamento-e2e"
-    },
-    {
       "path": "./apps/pagamento"
-    },
-    {
-      "path": "./apps/notificacao-e2e"
     },
     {
       "path": "./apps/notificacao"

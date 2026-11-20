@@ -11,3 +11,6 @@ coverage
 *.log
 vitest.config.*.timestamp*
 .vitest
+out-tsc
+test-output
+*.tsbuildinfo

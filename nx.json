@@ -10,7 +10,10 @@
       "!{projectRoot}/tsconfig.spec.json",
       "!{projectRoot}/jest.config.{cjs,mjs,js,cts,mts,ts}",
       "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s"
+      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/e2e/**/*",
+      "!{projectRoot}/vitest.e2e.config.mts",
+      "!{projectRoot}/tsconfig.e2e.json"
     ]
   },
   "targetDefaults": {
@@ -28,20 +31,7 @@
     },
     "lint": {
       "cache": true
-    },
-    "e2e-ci--**/**": [
-      {
-        "filter": {
-          "projects": [
-            "notificacao-e2e"
-          ]
-        },
-        "dependsOn": [
-          "notificacao:build",
-          "notificacao:serve"
-        ]
-      }
-    ]
+    }
   },
   "plugins": [
     "@nx-go/nx-go",
@@ -82,20 +72,7 @@
         "testTargetName": "test",
         "ciTargetName": "test-ci",
         "testMode": "watch"
-      },
-      "exclude": [
-        "apps/notificacao-e2e/**/*"
-      ]
-    },
-    {
-      "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
-      "exclude": [
-        "apps/pagamento-e2e/**/*",
-        "apps/notificacao-e2e/**/*"
-      ]
+      }
     },
     "@nx/js/node",
     {
@@ -112,17 +89,6 @@
           "watchDepsName": "watch-deps",
           "skipBuildCheck": true
         }
-      }
-    },
-    {
-      "plugin": "@nx/vitest",
-      "include": [
-        "apps/notificacao-e2e/**/*"
-      ],
-      "options": {
-        "testTargetName": "e2e",
-        "ciTargetName": "e2e-ci",
-        "testMode": "run"
       }
     }
   ],
