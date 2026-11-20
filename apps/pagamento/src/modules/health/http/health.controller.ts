@@ -1,6 +1,6 @@
 import { Controller, Get, Inject, ServiceUnavailableException } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
-import { DB, type Database } from '../db/database.module';
+import { DB, type Database } from '../../../shared/infrastructure/database/database.module';
 
 @Controller('health')
 export class HealthController {

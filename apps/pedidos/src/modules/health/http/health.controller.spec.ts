@@ -1,6 +1,6 @@
 import { ServiceUnavailableException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { DB } from '../db/database.module';
+import { DB } from '../../../shared/infrastructure/database/database.module';
 import { HealthController } from './health.controller';
 
 async function createController(execute: () => Promise<unknown>) {
