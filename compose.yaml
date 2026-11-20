@@ -88,7 +88,19 @@ services:
       <<: *app-healthcheck
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3002/api/health"]
 
+  # Roda as migrations (e o seed de dev) uma vez e sai. O estoque só sobe depois.
+  estoque-migrate:
+    image: microservices-lab-estoque
+    build: { context: ., dockerfile: docker/go.Dockerfile }
+    command: ["estoque", "migrate"]
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://estoque:estoque@postgres-estoque:5432/estoque
+    depends_on:
+      postgres-estoque: { condition: service_healthy }
+
   estoque:
+    image: microservices-lab-estoque
     build: { context: ., dockerfile: docker/go.Dockerfile }
     restart: unless-stopped
     environment:
@@ -98,7 +110,7 @@ services:
     # 3003 = HTTP (health), 50051 = gRPC (aberto no host para o `nx serve pedidos`)
     ports: ["3003:3003", "50051:50051"]
     depends_on:
-      postgres-estoque: { condition: service_healthy }
+      estoque-migrate: { condition: service_completed_successfully }
     healthcheck:
       <<: *app-healthcheck
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3003/api/health"]

@@ -9,6 +9,19 @@
       "options": {
         "race": true
       }
+    },
+    "integration": {
+      "command": "go test -race -count=1 -tags integration ./internal/inventory/postgres/...",
+      "options": {
+        "cwd": "apps/estoque"
+      },
+      "cache": false
+    },
+    "sqlc": {
+      "command": "go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1 generate",
+      "options": {
+        "cwd": "apps/estoque"
+      }
     }
   }
 }

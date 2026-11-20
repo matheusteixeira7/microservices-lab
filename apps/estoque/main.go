@@ -21,7 +21,7 @@ import (
 	inventoryv1 "apps/estoque/internal/gen/inventory/v1"
 	"apps/estoque/internal/inventory/app"
 	"apps/estoque/internal/inventory/grpcapi"
-	"apps/estoque/internal/inventory/memory"
+	"apps/estoque/internal/inventory/postgres"
 )
 
 // Só para desenvolvimento local (Postgres do docker compose na porta 5443).
@@ -74,6 +74,16 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	// `estoque migrate`: applies the migrations and exits (one-shot container).
+	// The server itself never migrates, so it boots even with the database down.
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		if err := postgres.Migrate(ctx, databaseURL); err != nil {
+			log.Fatalf("migrate: %v", err)
+		}
+		log.Print("migrations up to date")
+		return
+	}
+
 	// O pool é preguiçoso: só conecta na primeira query, então o serviço sobe
 	// mesmo com o banco fora do ar.
 	pool, err := pgxpool.New(ctx, databaseURL)
@@ -82,9 +92,8 @@ func main() {
 	}
 	defer pool.Close()
 
-	// --- inventory: domain + use cases, exposed over gRPC ---
-	// TEMPORARY: in-memory store (stock resets on restart) until Postgres.
-	inventory := app.NewService(memory.NewStore(seedProducts()...))
+	// --- inventory: domain + use cases on Postgres, exposed over gRPC ---
+	inventory := app.NewService(postgres.NewStore(pool))
 
 	grpcServer := grpc.NewServer()
 	inventoryv1.RegisterInventoryServiceServer(grpcServer, grpcapi.NewServer(inventory))

@@ -1,0 +1,12 @@
+# sqlc: you write SQL, it generates typed Go. Run: pnpm nx sqlc estoque
+# The generated code (internal/inventory/postgres/db) is committed.
+version: "2"
+sql:
+  - engine: postgresql
+    schema: internal/inventory/postgres/migrations
+    queries: internal/inventory/postgres/queries.sql
+    gen:
+      go:
+        package: db
+        out: internal/inventory/postgres/db
+        sql_package: pgx/v5
